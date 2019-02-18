@@ -1,0 +1,1 @@
+mpic++ -o a main.cpp md5.cpp && time mpirun -np 4 a aaaaa hashes\ 1e5.txt

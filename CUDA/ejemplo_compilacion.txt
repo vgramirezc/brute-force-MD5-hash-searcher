@@ -1,0 +1,3 @@
+!nvcc --device-c main.cu md5.cu
+!nvcc main.o md5.o
+!time ./a.out aaaaa 'hashes 1e5.txt' 1024

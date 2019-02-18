@@ -1,0 +1,1 @@
+g++ main.cpp md5.cpp -o a && time ./a aaaaa hashes\ 1e5.txt
