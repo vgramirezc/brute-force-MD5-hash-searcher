@@ -68,12 +68,13 @@ int get_total_strings( char* format, int format_size ){
 }
 
 char* value_to_password( long long val, char* format, int format_size ){
-    char* ans = new char[format_size];
+    char* ans = new char[format_size+1];
     for(int i = format_size-1; i >= 0; --i){
         int base = (format[i] == '0') ? 10 : 26;
         ans[i] = format[i] + val % base;
         val /= base;
     }
+    ans[format_size] = 0;
     return ans;
 }
 
