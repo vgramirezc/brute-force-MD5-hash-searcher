@@ -545,7 +545,7 @@ int main( int argc, char *argv[] ){
         cout << buildlog << endl;
     }
     
-    int * h_cnt = (int*)malloc(total_wi);
+    int * h_cnt = (int*) malloc(sizeof(int) * total_wi);
     cl::Buffer d_cnt(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * total_wi, nullptr, &err);
     check_error(2, err);
     cl::Buffer d_format(context, CL_MEM_READ_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR, sizeof(format), format, &err);
@@ -585,13 +585,13 @@ int main( int argc, char *argv[] ){
     check_error(13, err);
 
     cl::CommandQueue queue(context, device);
-    err = queue.enqueueFillBuffer(d_cnt, 0, 0, sizeof(int)*total_wi);
+    err = queue.enqueueFillBuffer(d_cnt, 0, 0, sizeof(int) * total_wi);
     check_error(13.2, err);
     err = queue.enqueueFillBuffer(d_matches, 0, 0, sizeof(int)*SIZE_MATCHES);
     check_error(13.3, err);
     err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(total_wi));
     check_error(14, err);
-    err = queue.enqueueReadBuffer(d_cnt, CL_TRUE, 0, sizeof(int)*total_wi, h_cnt);
+    err = queue.enqueueReadBuffer(d_cnt, CL_TRUE, 0, sizeof(int) * total_wi, h_cnt);
     check_error(15, err);
     err = queue.enqueueReadBuffer(d_matches, CL_TRUE, 0, sizeof(matches_ids), matches_ids);
     check_error(15, err);
