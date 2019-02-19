@@ -86,4 +86,5 @@ if [ $CUDA_FLAG = true ]; then
 fi
 
 #Get Graphics
+mkdir Graphics
 python GraphicsGenerator.py
