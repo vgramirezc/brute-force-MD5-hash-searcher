@@ -491,11 +491,12 @@ void value_to_password( long long val, char* format, int format_size, char* pass
 }
 
 int main( int argc, char *argv[] ){
-    if( argc != 4 ){
-        printf( "You must pass exactly three arguments:\n" );
+    if( argc != 5 ){
+        printf( "You must pass exactly four arguments:\n" );
         printf( "  1. The password pattern\n" );
         printf( "  2. The name of the file containing the hashes.\n" );
-        printf( "  3. The total of work items.\n" );
+        printf( "  3. The global total of work items.\n" );
+        printf( "  4. The number of work groups.\n" );
         exit( 0 );
     }
     char * format = argv[1];
@@ -518,6 +519,13 @@ int main( int argc, char *argv[] ){
         printf( "Invalid argument [%s]. The number of work items must be a positive integer.\n", argv[3] );
         exit( 0 );
     }
+    int total_wg = ch_to_int( argv[ 4 ] );
+    if( total_wg <= 0 ){
+        printf( "Invalid argument [%s]. The number of work groups must be a positive integer.\n", argv[4] );
+        exit( 0 );
+    }
+    if(total_wi < total_wg) total_wg = total_wi;
+    total_wi = total_wi / total_wg * total_wg;
 
     build_hashes_trie( in_hash );
     long long total_strings = get_total_strings( format, format_size );
@@ -590,7 +598,7 @@ int main( int argc, char *argv[] ){
     check_error(13.2, err);
     err = queue.enqueueFillBuffer(d_matches, 0, 0, sizeof(int)*SIZE_MATCHES);
     check_error(13.3, err);
-    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(total_wi));
+    err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(total_wi), cl::NDRange(total_wi/total_wg));
     check_error(14, err);
     err = queue.enqueueReadBuffer(d_cnt, CL_TRUE, 0, sizeof(int) * total_wi, h_cnt);
     check_error(15, err);
@@ -608,7 +616,7 @@ int main( int argc, char *argv[] ){
             value_to_password( matches_ids[idx + j], format, format_size, match_pass );
             change_text(&md5, match_pass);
             hexdigest(&md5, match_hash);
-            printf("Hash %s matched with string %s\n", match_hash, match_pass);
+            //printf("Hash %s matched with string %s\n", match_hash, match_pass);
         }
         total_matches += h_cnt[i];
     }

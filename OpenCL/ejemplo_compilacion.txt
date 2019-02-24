@@ -1,1 +1,1 @@
-g++ main.cpp -o a -l OpenCL && time ./a aaaaa hashes\ 1e5.txt 4
+g++ main.cpp -o a -l OpenCL && time ./a aaaaa hashes\ 1e5.txt 1024 32

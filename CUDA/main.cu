@@ -12,7 +12,6 @@ using namespace std;
 const int HASH_LENGTH = 32;
 const int HASH_ALPHA_SIZE = 16;
 const int MAX_HASHES_SIZE = 100005;
-const int NUMBER_OF_BLOCKS = 26;
 const int SIZE_MATCHES = 5e5;
 int trie_size = 0;
 int hashes_trie[HASH_ALPHA_SIZE*HASH_LENGTH*MAX_HASHES_SIZE];
@@ -121,11 +120,12 @@ __global__ void brute_force( int * d_cnt, int * d_trie, char * d_format, MD5* d_
 }
 
 int main( int argc, char *argv[] ){
-    if( argc != 4 ){
-        printf( "You must pass exactly three arguments:\n" );
+    if( argc != 5 ){
+        printf( "You must pass exactly four arguments:\n" );
         printf( "  1. The password pattern\n" );
         printf( "  2. The name of the file containing the hashes.\n" );
-        printf( "  3. The number of threads.\n" );
+        printf( "  3. The total number of threads.\n" );
+        printf( "  4. The number of blocks.\n" );
         exit( 0 );
     }
     char * format = argv[1];
@@ -146,6 +146,11 @@ int main( int argc, char *argv[] ){
     int num_threads = ch_to_int( argv[ 3 ] );
     if( num_threads <= 0 ){
         printf( "Invalid argument [%s]. The number of threads must be a positive integer.\n", argv[3] );
+        exit( 0 );
+    }
+    int number_of_blocks = ch_to_int( argv[ 4 ] );
+    if( number_of_blocks <= 0 ){
+        printf( "Invalid argument [%s]. The number of blocks must be a positive integer.\n", argv[4] );
         exit( 0 );
     }
     build_hashes_trie( in_hash );
@@ -225,16 +230,16 @@ int main( int argc, char *argv[] ){
 
     //Launch kernel
     int total_threads;
-    if(num_threads <= NUMBER_OF_BLOCKS){
+    if(num_threads <= number_of_blocks){
         total_threads = num_threads;
         printf("CUDA kernel launch with %d block(s) of %d thread(s) Total: %i\n", num_threads, 1, num_threads);
         brute_force<<<num_threads, 1>>>(d_cnt, d_trie, d_format, d_encrypter, d_passwords, d_hashes, d_matches, format_size, num_threads, total_strings);
     }
     else{
-        int threads_per_block = num_threads/NUMBER_OF_BLOCKS;
-        total_threads = NUMBER_OF_BLOCKS * threads_per_block;
-        printf("CUDA kernel launch with %d block(s) of %d thread(s) Total: %i\n", NUMBER_OF_BLOCKS, threads_per_block, total_threads);
-        brute_force<<<NUMBER_OF_BLOCKS, threads_per_block>>>(d_cnt, d_trie, d_format, d_encrypter, d_passwords, d_hashes, d_matches, format_size, total_threads, total_strings);
+        int threads_per_block = num_threads/number_of_blocks;
+        total_threads = number_of_blocks * threads_per_block;
+        printf("CUDA kernel launch with %d block(s) of %d thread(s) Total: %i\n", number_of_blocks, threads_per_block, total_threads);
+        brute_force<<<number_of_blocks, threads_per_block>>>(d_cnt, d_trie, d_format, d_encrypter, d_passwords, d_hashes, d_matches, format_size, total_threads, total_strings);
     }
 
     err = cudaGetLastError();
