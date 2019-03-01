@@ -6,12 +6,12 @@ MPI_FLAG=tru
 OCL_FLAG=true
 
 TIMEFORMAT=%R
-ITER=1
+ITER=5
 format=aaaaa
 threads1='1 2 4 8 16 32 64'
-threads2='4096 8192'
+threads2='1 2 4 8 16 32 64 128 256 512 1024 2048 4096 8192'
 blocks='13 26 39 52 65 78 91'
-workgroups='128 160'
+workgroups='32 64 96 128 160'
 #################### Secuencial ######################
 if [ $SEC_FLAG = true ]; then
     echo "Running sequential version ..."

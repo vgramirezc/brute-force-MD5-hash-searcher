@@ -62,7 +62,7 @@ def getGraphic(toolName, timesFile, xAxisName, secTime, legendName=""):
         for i in range(len(blocks)):
             plt.plot(numbers[i], times[i], label=str(blocks[i]) + " " + legendName)
         plt.legend()
-        #plt.show()
+        plt.show()
         plt.savefig( "Graphics/"+toolName+"Time" )
         plt.clf()
         #Speedup graphic
@@ -70,8 +70,8 @@ def getGraphic(toolName, timesFile, xAxisName, secTime, legendName=""):
         for time in times:
             speedup.append([])
             speedup[-1] = map(lambda x: secTime/x, time)
-        #plt.xticks( [256, 1024, 2048, 4096, 8192] )
-        plt.xticks( numbers[0] )
+        plt.xticks( [256, 1024, 2048, 4096, 8192] )
+        #plt.xticks( numbers[0] )
         plt.xlabel( xAxisName )
         plt.title( "Speedup (" + toolName + ")" )
         for i in range(len(blocks)):
